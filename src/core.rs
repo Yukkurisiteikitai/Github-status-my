@@ -211,6 +211,14 @@ pub fn format_response(username: &str, stats: &GitHubStats, rank: Rank, show_pro
                 draw_progress_bar(&mut svg_content, 20, 980, y, &format!("Stars: {}/{}", stats.stars, next_reqs.stars), 
                     stats.stars, next_reqs.stars, style);
             }
+        } else {
+            // Rank S has no next tier. Show a one-line cat instead of a progress bar.
+            y += 24;
+            svg_content.push_str(&format!(
+                "\n  <text x=\"980\" y=\"{}\" class=\"progress-label\" text-anchor=\"end\">{}</text>",
+                y,
+                escape_svg("/\\_/\\ (=^.^=)")
+            ));
         }
     }
     
