@@ -9,6 +9,12 @@ const RANK_C_ART: &str = include_str!("../rank/c.md");
 const RANK_B_ART: &str = include_str!("../rank/b.md");
 const RANK_A_ART: &str = include_str!("../rank/a.md");
 const RANK_S_ART: &str = include_str!("../rank/s.md");
+const DEFAULT_OUTPUT_WIDTH: u32 = 820;
+const DEFAULT_OUTPUT_HEIGHT: u32 = 400;
+const MIN_OUTPUT_WIDTH: u32 = 360;
+const MIN_OUTPUT_HEIGHT: u32 = 220;
+const MAX_OUTPUT_WIDTH: u32 = 2000;
+const MAX_OUTPUT_HEIGHT: u32 = 1400;
 
 #[derive(Clone)]
 pub struct GitHubClient {
@@ -101,7 +107,15 @@ struct Repo {
 }
 
 pub fn help_text() -> &'static str {
-    "GitHub Rank API\nGET /rank?user=<username>\n"
+    "GitHub Rank API\nGET /rank?user=<username>&bar=true&style=bar&width=800&height=400\n"
+}
+
+pub fn normalize_output_size(width: Option<u32>, height: Option<u32>) -> (u32, u32) {
+    let width = width.unwrap_or(DEFAULT_OUTPUT_WIDTH).clamp(MIN_OUTPUT_WIDTH, MAX_OUTPUT_WIDTH);
+    let height = height
+        .unwrap_or(DEFAULT_OUTPUT_HEIGHT)
+        .clamp(MIN_OUTPUT_HEIGHT, MAX_OUTPUT_HEIGHT);
+    (width, height)
 }
 
 pub fn validate_github_username(raw: &str) -> Result<String, String> {
@@ -141,31 +155,51 @@ pub fn determine_rank(stats: &GitHubStats) -> Rank {
     }
 }
 
-pub fn format_response(username: &str, stats: &GitHubStats, rank: Rank, show_progress: bool, loading_style: Option<&str>) -> String {
+pub fn format_response(
+    username: &str,
+    stats: &GitHubStats,
+    rank: Rank,
+    show_progress: bool,
+    loading_style: Option<&str>,
+    output_width: u32,
+    output_height: u32,
+) -> String {
     let ascii_art = rank.art();
     let lines = ascii_art.lines().collect::<Vec<_>>();
     
     let mut svg_content = String::new();
-    let line_height = 16;
-    let width = 1000;
+    let line_height = 16u32;
+    let width = 1000u32;
+    let art_x = 24u32;
+    let info_right_x = 900u32;
+    let progress_left_x = 648u32;
     let height = if show_progress {
         (lines.len() as u32 + 8) * line_height + 150
     } else {
         (lines.len() as u32 + 8) * line_height + 120
     };
+
+    let (output_width, output_height) = normalize_output_size(Some(output_width), Some(output_height));
+
+    let text_font_size = scale_font(12, width, height, output_width, output_height);
+    let ascii_font_size = scale_font(11, width, height, output_width, output_height);
+    let info_font_size = scale_font(11, width, height, output_width, output_height);
+    let progress_font_size = scale_font(9, width, height, output_width, output_height);
     
-    svg_content.push_str(&format!("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {} {}\" style=\"background-color: #ffffff\">"
-        , width, height));
+    svg_content.push_str(&format!(
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"{}\" height=\"{}\" viewBox=\"0 0 {} {}\" style=\"background-color: #ffffff\">",
+        output_width, output_height, output_width, output_height
+    ));
     svg_content.push_str("\n  <defs>");
     svg_content.push_str("\n    <style type=\"text/css\"><![CDATA[");
-    svg_content.push_str("\n      text { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace; font-size: 12px; fill: #000; }");
-    svg_content.push_str("\n      .ascii-art { font-size: 11px; white-space: pre; }");
-    svg_content.push_str("\n      .info { font-size: 11px; fill: #333; }");
-    svg_content.push_str("\n      .progress-label { font-size: 9px; fill: #666; }");
+    svg_content.push_str(&format!("\n      text {{ font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace; font-size: {}px; fill: #000; }}", text_font_size));
+    svg_content.push_str(&format!("\n      .ascii-art {{ font-size: {}px; white-space: pre; }}", ascii_font_size));
+    svg_content.push_str(&format!("\n      .info {{ font-size: {}px; fill: #333; }}", info_font_size));
+    svg_content.push_str(&format!("\n      .progress-label {{ font-size: {}px; fill: #666; }}", progress_font_size));
     svg_content.push_str("\n    ]]></style>");
     svg_content.push_str("\n  </defs>");
     svg_content.push_str(&format!("\n  <rect width=\"{}\" height=\"{}\" fill=\"white\" stroke=\"#ddd\" stroke-width=\"1\"/>"
-        , width, height));
+        , output_width, output_height));
     
     // Header info
     let info_lines = vec![
@@ -177,8 +211,9 @@ pub fn format_response(username: &str, stats: &GitHubStats, rank: Rank, show_pro
     let mut y = 20;
     for line in &info_lines {
         svg_content.push_str(&format!(
-            "\n  <text x=\"980\" y=\"{}\" class=\"info\" text-anchor=\"end\">{}</text>",
-            y, escape_svg(line)
+            "\n  <text x=\"{}\" y=\"{}\" class=\"info\" text-anchor=\"end\">{}</text>",
+            scale_axis(info_right_x, width, output_width),
+            scale_axis(y, height, output_height), escape_svg(line)
         ));
         y += 16;
     }
@@ -189,7 +224,12 @@ pub fn format_response(username: &str, stats: &GitHubStats, rank: Rank, show_pro
             let next_reqs = next.requirements();
             
             y += 10;
-            svg_content.push_str(&format!("\n  <text x=\"980\" y=\"{}\" class=\"progress-label\" text-anchor=\"end\">Next: {}</text>", y, next.label()));
+            svg_content.push_str(&format!(
+                "\n  <text x=\"{}\" y=\"{}\" class=\"progress-label\" text-anchor=\"end\">Next: {}</text>",
+                scale_axis(info_right_x, width, output_width),
+                scale_axis(y, height, output_height),
+                next.label()
+            ));
             
             let style = loading_style.unwrap_or("bar");
             let row_step: u32 = match style {
@@ -199,24 +239,25 @@ pub fn format_response(username: &str, stats: &GitHubStats, rank: Rank, show_pro
             };
 
             y += 14;
-            draw_progress_bar(&mut svg_content, 20, 980, y, &format!("Commits: {}/{}", stats.commits, next_reqs.commits), 
-                stats.commits, next_reqs.commits, style);
+            draw_progress_bar(&mut svg_content, progress_left_x, info_right_x, y, &format!("Commits: {}/{}", stats.commits, next_reqs.commits), 
+                stats.commits, next_reqs.commits, style, width, height, output_width, output_height, progress_font_size);
             
             y += row_step;
-            draw_progress_bar(&mut svg_content, 20, 980, y, &format!("PRs: {}/{}", stats.prs, next_reqs.prs), 
-                stats.prs, next_reqs.prs, style);
+            draw_progress_bar(&mut svg_content, progress_left_x, info_right_x, y, &format!("PRs: {}/{}", stats.prs, next_reqs.prs), 
+                stats.prs, next_reqs.prs, style, width, height, output_width, output_height, progress_font_size);
             
             if next_reqs.stars > 0 {
                 y += row_step;
-                draw_progress_bar(&mut svg_content, 20, 980, y, &format!("Stars: {}/{}", stats.stars, next_reqs.stars), 
-                    stats.stars, next_reqs.stars, style);
+                draw_progress_bar(&mut svg_content, progress_left_x, info_right_x, y, &format!("Stars: {}/{}", stats.stars, next_reqs.stars), 
+                    stats.stars, next_reqs.stars, style, width, height, output_width, output_height, progress_font_size);
             }
         } else {
             // Rank S has no next tier. Show a one-line cat instead of a progress bar.
             y += 24;
             svg_content.push_str(&format!(
-                "\n  <text x=\"980\" y=\"{}\" class=\"progress-label\" text-anchor=\"end\">{}</text>",
-                y,
+                "\n  <text x=\"{}\" y=\"{}\" class=\"progress-label\" text-anchor=\"end\">{}</text>",
+                scale_axis(info_right_x, width, output_width),
+                scale_axis(y, height, output_height),
                 escape_svg("/\\_/\\ (=^.^=)")
             ));
         }
@@ -227,8 +268,9 @@ pub fn format_response(username: &str, stats: &GitHubStats, rank: Rank, show_pro
     svg_content.push_str("\n  <g>");
     for line in lines {
         svg_content.push_str(&format!(
-            "\n    <text x=\"20\" y=\"{}\" class=\"ascii-art\" xml:space=\"preserve\" dominant-baseline=\"hanging\">{}</text>",
-            y, escape_svg(line)
+            "\n    <text x=\"{}\" y=\"{}\" class=\"ascii-art\" xml:space=\"preserve\" dominant-baseline=\"hanging\">{}</text>",
+            scale_axis(art_x, width, output_width),
+            scale_axis(y, height, output_height), escape_svg(line)
         ));
         y += line_height;
     }
@@ -238,11 +280,30 @@ pub fn format_response(username: &str, stats: &GitHubStats, rank: Rank, show_pro
     svg_content
 }
 
-fn draw_progress_bar(svg: &mut String, x: u32, x_end: u32, y: u32, label: &str, current: u64, max: u64, style: &str) {
-    let bar_width = 200;
-    let bar_height = 10;
-    let right_padding = 8;
-    let content_right = x_end.saturating_sub(right_padding);
+fn draw_progress_bar(
+    svg: &mut String,
+    x: u32,
+    x_end: u32,
+    y: u32,
+    label: &str,
+    current: u64,
+    max: u64,
+    style: &str,
+    design_width: u32,
+    design_height: u32,
+    output_width: u32,
+    output_height: u32,
+    progress_font_size: u32,
+) {
+    let bar_width = scale_axis(200, design_width, output_width).max(60);
+    let bar_height = scale_axis(10, design_height, output_height).max(4);
+    let right_padding = scale_axis(8, design_width, output_width);
+    let content_right = scale_axis(x_end, design_width, output_width).saturating_sub(right_padding);
+    let left_x = scale_axis(x, design_width, output_width);
+    let y_main = scale_axis(y, design_height, output_height);
+    let y_bar = scale_axis(y + 5, design_height, output_height);
+    let y_text = scale_axis(y + 12, design_height, output_height);
+    let y_percent = scale_axis(y + 14, design_height, output_height);
     let progress = if max > 0 {
         ((current as f32 / max as f32) * bar_width as f32).clamp(0.0, bar_width as f32)
     } else {
@@ -251,16 +312,16 @@ fn draw_progress_bar(svg: &mut String, x: u32, x_end: u32, y: u32, label: &str, 
     
     // ラベルを右に配置
     svg.push_str(&format!("\n  <text x=\"{}\" y=\"{}\" class=\"progress-label\" text-anchor=\"end\">{}</text>", 
-        content_right, y, escape_svg(label)));
+        content_right, y_main, escape_svg(label)));
     
     match style {
         "bar" => {
             // Traditional bar (white fill on black background) - right aligned
-            let bar_x = (content_right.saturating_sub(bar_width)).max(x);
+            let bar_x = content_right.saturating_sub(bar_width).max(left_x);
             svg.push_str(&format!("\n  <rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"#000\" stroke=\"#333\" stroke-width=\"0.5\"/>", 
-                bar_x, y + 5, bar_width, bar_height));
+                bar_x, y_bar, bar_width, bar_height));
             svg.push_str(&format!("\n  <rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"#fff\" opacity=\"0.9\"/>", 
-                bar_x, y + 5, progress as u32, bar_height));
+                bar_x, y_bar, progress as u32, bar_height));
         }
         "blocks" => {
             // ===== ----- style
@@ -270,8 +331,8 @@ fn draw_progress_bar(svg: &mut String, x: u32, x_end: u32, y: u32, label: &str, 
                 "=".repeat(filled as usize),
                 "-".repeat(empty as usize)
             );
-            svg.push_str(&format!("\n  <text x=\"{}\" y=\"{}\" class=\"progress-label\" font-family=\"monospace\" font-size=\"10px\" text-anchor=\"end\">{}</text>", 
-                content_right, y + 12, escape_svg(&block_str)));
+            svg.push_str(&format!("\n  <text x=\"{}\" y=\"{}\" class=\"progress-label\" font-family=\"monospace\" font-size=\"{}px\" text-anchor=\"end\">{}</text>", 
+                content_right, y_text, progress_font_size + 1, escape_svg(&block_str)));
         }
         "dots" => {
             // ■■■□□□ style
@@ -281,24 +342,41 @@ fn draw_progress_bar(svg: &mut String, x: u32, x_end: u32, y: u32, label: &str, 
                 "■".repeat(filled as usize),
                 "□".repeat(empty as usize)
             );
-            svg.push_str(&format!("\n  <text x=\"{}\" y=\"{}\" class=\"progress-label\" font-family=\"monospace\" font-size=\"10px\" text-anchor=\"end\">{}</text>", 
-                content_right, y + 12, escape_svg(&dot_str)));
+            svg.push_str(&format!("\n  <text x=\"{}\" y=\"{}\" class=\"progress-label\" font-family=\"monospace\" font-size=\"{}px\" text-anchor=\"end\">{}</text>", 
+                content_right, y_text, progress_font_size + 1, escape_svg(&dot_str)));
         }
         "percentage" => {
             // Percentage only
             let percent = if max > 0 { (current as f32 / max as f32 * 100.0) as u32 } else { 0 };
-            svg.push_str(&format!("\n  <text x=\"{}\" y=\"{}\" class=\"progress-label\" font-size=\"11px\" text-anchor=\"end\">{:3}%</text>", 
-                content_right, y + 14, percent));
+            svg.push_str(&format!("\n  <text x=\"{}\" y=\"{}\" class=\"progress-label\" font-size=\"{}px\" text-anchor=\"end\">{:3}%</text>", 
+                content_right, y_percent, progress_font_size + 2, percent));
         }
         _ => {
             // Default to bar
-            let bar_x = (content_right.saturating_sub(bar_width)).max(x);
+            let bar_x = content_right.saturating_sub(bar_width).max(left_x);
             svg.push_str(&format!("\n  <rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"#000\" stroke=\"#333\" stroke-width=\"0.5\"/>", 
-                bar_x, y + 5, bar_width, bar_height));
+                bar_x, y_bar, bar_width, bar_height));
             svg.push_str(&format!("\n  <rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" fill=\"#fff\" opacity=\"0.9\"/>", 
-                bar_x, y + 5, progress as u32, bar_height));
+                bar_x, y_bar, progress as u32, bar_height));
         }
     }
+}
+
+fn scale_axis(value: u32, design: u32, output: u32) -> u32 {
+    if value == 0 || design == 0 {
+        return 0;
+    }
+    ((value as f32 / design as f32) * output as f32).round() as u32
+}
+
+fn scale_font(base: u32, design_w: u32, design_h: u32, output_w: u32, output_h: u32) -> u32 {
+    if design_w == 0 || design_h == 0 {
+        return base;
+    }
+    let ratio_x = output_w as f32 / design_w as f32;
+    let ratio_y = output_h as f32 / design_h as f32;
+    let ratio = ratio_x.min(ratio_y);
+    (base as f32 * ratio).round().clamp(7.0, 48.0) as u32
 }
 
 fn escape_svg(text: &str) -> String {
