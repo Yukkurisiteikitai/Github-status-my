@@ -1,6 +1,6 @@
 mod core;
 
-use axum::{Router, extract::{Query, State}, http::StatusCode, response::IntoResponse, routing::get};
+use axum::{Router, extract::{Query, State}, http::{StatusCode, HeaderMap}, response::IntoResponse, routing::get};
 use serde::Deserialize;
 use std::sync::Arc;
 
@@ -12,6 +12,10 @@ struct AppState {
 #[derive(Deserialize)]
 struct RankQuery {
     user: String,
+    #[serde(default)]
+    bar: Option<String>,
+    #[serde(default)]
+    style: Option<String>,
 }
 
 #[tokio::main]
@@ -46,17 +50,34 @@ async fn rank_handler(
     State(state): State<Arc<AppState>>,
     Query(query): Query<RankQuery>,
 ) -> impl IntoResponse {
+    let show_progress = query.bar
+        .as_ref()
+        .map(|v| v.to_lowercase() == "true")
+        .unwrap_or(false);
+
+    let loading_style = query.style.as_deref();
+
     let username = match core::validate_github_username(&query.user) {
         Ok(name) => name,
-        Err(message) => return (StatusCode::BAD_REQUEST, message).into_response(),
+        Err(message) => {
+            let mut headers = HeaderMap::new();
+            headers.insert("content-type", "image/svg+xml; charset=utf-8".parse().unwrap());
+            return (StatusCode::BAD_REQUEST, headers, message).into_response();
+        }
     };
 
     let stats = match state.github.fetch_stats(&username).await {
         Ok(stats) => stats,
-        Err(message) => return (StatusCode::BAD_GATEWAY, message).into_response(),
+        Err(message) => {
+            let mut headers = HeaderMap::new();
+            headers.insert("content-type", "image/svg+xml; charset=utf-8".parse().unwrap());
+            return (StatusCode::BAD_GATEWAY, headers, message).into_response();
+        }
     };
 
     let rank = core::determine_rank(&stats);
-    let body = core::format_response(&username, &stats, rank);
-    (StatusCode::OK, body).into_response()
+    let body = core::format_response(&username, &stats, rank, show_progress, loading_style);
+    let mut headers = HeaderMap::new();
+    headers.insert("content-type", "image/svg+xml; charset=utf-8".parse().unwrap());
+    (StatusCode::OK, headers, body).into_response()
 }

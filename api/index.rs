@@ -35,6 +35,12 @@ async fn rank_response(request: Request) -> Result<Response<ResponseBody>, Error
         }
     };
 
+    let show_progress = query.get("bar")
+        .map(|v| v.to_lowercase() == "true")
+        .unwrap_or(false);
+
+    let loading_style = query.get("style").map(|s| s.as_str());
+
     let username = match core::validate_github_username(user) {
         Ok(name) => name,
         Err(message) => return plain_text(400, message),
@@ -56,13 +62,13 @@ async fn rank_response(request: Request) -> Result<Response<ResponseBody>, Error
     };
 
     let rank = core::determine_rank(&stats);
-    let body = core::format_response(&username, &stats, rank);
+    let body = core::format_response(&username, &stats, rank, show_progress, loading_style);
     plain_text(200, body)
 }
 
 fn plain_text(status: u16, body: String) -> Result<Response<ResponseBody>, Error> {
     Ok(Response::builder()
         .status(status)
-        .header("content-type", "text/plain; charset=utf-8")
+        .header("content-type", "image/svg+xml; charset=utf-8")
         .body(body.into())?)
 }
