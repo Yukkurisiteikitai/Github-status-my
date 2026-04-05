@@ -136,8 +136,13 @@ impl GitHubClient {
             HeaderValue::from_static("2022-11-28"),
         );
 
-        let token = std::env::var("GITHUB_PAT")
+        let token_raw = std::env::var("GITHUB_PAT")
+            .or_else(|_| std::env::var("github_pat"))
             .map_err(|_| "GITHUB_PAT is required. set your GitHub Personal Access Token".to_string())?;
+        let token = token_raw.trim();
+        if token.is_empty() {
+            return Err("GITHUB_PAT is empty".to_string());
+        }
         let auth_value = HeaderValue::from_str(&format!("Bearer {token}"))
             .map_err(|_| "invalid GITHUB_PAT header value".to_string())?;
         headers.insert(AUTHORIZATION, auth_value);
