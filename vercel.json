@@ -1,0 +1,18 @@
+{
+  "builds": [
+    {
+      "src": "api/index.rs",
+      "use": "@vercel/rust"
+    }
+  ],
+  "routes": [
+    {
+      "src": "^/$",
+      "dest": "api/index.rs"
+    },
+    {
+      "src": "^/rank$",
+      "dest": "api/index.rs"
+    }
+  ]
+}

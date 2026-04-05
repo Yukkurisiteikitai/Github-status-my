@@ -1,0 +1,20 @@
+[package]
+name = "Github-status-my"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "github-status-my"
+path = "src/main.rs"
+
+[[bin]]
+name = "vercel-api"
+path = "api/index.rs"
+
+[dependencies]
+axum = "0.8"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+serde = { version = "1", features = ["derive"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+url = "2"
+vercel_runtime = "1"
