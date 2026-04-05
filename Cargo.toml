@@ -17,4 +17,4 @@ reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 url = "2"
-vercel_runtime = "1"
+vercel_runtime = { version = "2" }
