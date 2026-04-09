@@ -1,53 +1,61 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 854" style="background-color: #ffffff">
-  <defs>
-    <style type="text/css"><![CDATA[
-      text { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace; font-size: 12px; fill: #000; }
-      .ascii-art { font-size: 11px; white-space: pre; }
-      .info { font-size: 11px; fill: #333; }
-      .progress-label { font-size: 9px; fill: #666; }
-    ]]></style>
-  </defs>
-  <rect width="1000" height="854" fill="white" stroke="#ddd" stroke-width="1"/>
-  <text x="980" y="20" class="info" text-anchor="end">User: cordx56</text>
-  <text x="980" y="36" class="info" text-anchor="end">Commits: 3989  PRs: 133  Stars: 5400</text>
-  <text x="980" y="52" class="info" text-anchor="end">Rank: Rank S (World Tree)  (1000 commits + 100 PRs + 50 stars)</text>
-  <text x="980" y="92" class="progress-label" text-anchor="end">/\_/\ (=^.^=)</text>
-  <g>
-    <text x="20" y="130" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">* . * . * . * . * . * . * . * . * . *</text>
-    <text x="20" y="146" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . * . * .*(*). * . * . * . * .</text>
-    <text x="20" y="162" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . * . * . *\|/* . * . * . * . *</text>
-    <text x="20" y="178" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . * . * . * * . * . * . * . * .</text>
-    <text x="20" y="194" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . * . * .*/ · \* . * . * . * . *</text>
-    <text x="20" y="210" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . * . */ · · · \ . * . * . * .</text>
-    <text x="20" y="226" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . * . */ · * * · \ * . * . * . *</text>
-    <text x="20" y="242" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . * /· * . * . * ·\ . * . * .</text>
-    <text x="20" y="258" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . * / · . * * * . · \ * . * . *</text>
-    <text x="20" y="274" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . /· * . * * * * . *·\. * . * .</text>
-    <text x="20" y="290" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . /· * . * * * * * . *·\ * . *</text>
-    <text x="20" y="306" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * /· * . . * * * * * . . *·\. * .</text>
-    <text x="20" y="322" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * |· * . * * * * * * * * . * ·| * .</text>
-    <text x="20" y="338" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . *|· . * * * * * * * * * * . ·|* . *</text>
-    <text x="20" y="354" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * |· * . * * * * * * * * . * ·| * .</text>
-    <text x="20" y="370" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . *|· . * * * * * * * * * * . ·|* . *</text>
-    <text x="20" y="386" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . . |· * . * * * . * * * . * . ·| . *</text>
-    <text x="20" y="402" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * .  |·  * .   * . * . *   . *  ·|  * .</text>
-    <text x="20" y="418" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * |  * .       * *       . *  | * . *</text>
-    <text x="20" y="434" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * .  |    *   *  / · \  *   *    |  * .</text>
-    <text x="20" y="450" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * |     .    /  ·  \    .     | * . *</text>
-    <text x="20" y="466" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * .  |    *    /  · ·  \    *    |  * .</text>
-    <text x="20" y="482" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * |    .   /  ·   ·  \   .    | * . *</text>
-    <text x="20" y="498" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * .  |  *    / · ·   · · \    *  |  * .</text>
-    <text x="20" y="514" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * | . *  /·  ·  ·  ·  ·\  * . | * . *</text>
-    <text x="20" y="530" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * .  `-----/· · · · · · · ·\-----` * .</text>
-    <text x="20" y="546" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . *       |   ·   ·   ·   |       * . *</text>
-    <text x="20" y="562" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . *  |               |  * . * . * .</text>
-    <text x="20" y="578" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . * . |               | . * . * . *</text>
-    <text x="20" y="594" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">.___________ |_______*_______|___________.</text>
-    <text x="20" y="610" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|            |       |       |            |</text>
-    <text x="20" y="626" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|            |       |       |            |</text>
-    <text x="20" y="642" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|____________|_______|_______|____________|</text>
-    <text x="20" y="658" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|                                         |</text>
-    <text x="20" y="674" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|    ~~~  ~~~  R A N K   S  ~~~  ~~~      |</text>
-    <text x="20" y="690" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|_________________________________________|</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="495" height="485" viewBox="0 0 495 485" fill="none">
+  <style>
+    .header { font: 700 16px 'Segoe UI', Ubuntu, Sans-Serif; fill: #000; }
+    .stat-label { font: 400 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: #333; }
+    .stat-value { font: 700 14px 'Segoe UI', Ubuntu, Sans-Serif; fill: #000; }
+    .rank-text { font: 700 20px 'Segoe UI', Ubuntu, Sans-Serif; fill: #000; }
+    .rank-sub { font: 400 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #666; }
+    .ascii-art { font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Courier New', monospace; font-size: 8px; fill: #111; line-height: 1; }
+    .progress-label { font: 400 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: #666; }
+  </style>
+  <rect x="0.5" y="0.5" rx="4.5" width="494" height="484" stroke="#111" stroke-width="1.5" fill="#fff"/>
+  <text x="25" y="35" class="header">cordx56's GitHub Status</text>
+  <g transform="translate(25, 60)">    <text x="0" y="0" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">* . * . * . * . * . * . * . * . * . *</text>
+    <text x="0" y="10" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . * . * .*(*). * . * . * . * .</text>
+    <text x="0" y="20" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . * . * . *\|/* . * . * . * . *</text>
+    <text x="0" y="30" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . * . * . * * . * . * . * . * .</text>
+    <text x="0" y="40" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . * . * .*/ · \* . * . * . * . *</text>
+    <text x="0" y="50" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . * . */ · · · \ . * . * . * .</text>
+    <text x="0" y="60" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . * . */ · * * · \ * . * . * . *</text>
+    <text x="0" y="70" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . * /· * . * . * ·\ . * . * .</text>
+    <text x="0" y="80" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . * / · . * * * . · \ * . * . *</text>
+    <text x="0" y="90" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . /· * . * * * * . *·\. * . * .</text>
+    <text x="0" y="100" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . /· * . * * * * * . *·\ * . *</text>
+    <text x="0" y="110" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * /· * . . * * * * * . . *·\. * .</text>
+    <text x="0" y="120" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * |· * . * * * * * * * * . * ·| * .</text>
+    <text x="0" y="130" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . *|· . * * * * * * * * * * . ·|* . *</text>
+    <text x="0" y="140" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * |· * . * * * * * * * * . * ·| * .</text>
+    <text x="0" y="150" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . *|· . * * * * * * * * * * . ·|* . *</text>
+    <text x="0" y="160" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . . |· * . * * * . * * * . * . ·| . *</text>
+    <text x="0" y="170" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * .  |·  * .   * . * . *   . *  ·|  * .</text>
+    <text x="0" y="180" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * |  * .       * *       . *  | * . *</text>
+    <text x="0" y="190" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * .  |    *   *  / · \  *   *    |  * .</text>
+    <text x="0" y="200" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * |     .    /  ·  \    .     | * . *</text>
+    <text x="0" y="210" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * .  |    *    /  · ·  \    *    |  * .</text>
+    <text x="0" y="220" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * |    .   /  ·   ·  \   .    | * . *</text>
+    <text x="0" y="230" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * .  |  *    / · ·   · · \    *  |  * .</text>
+    <text x="0" y="240" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * | . *  /·  ·  ·  ·  ·\  * . | * . *</text>
+    <text x="0" y="250" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * .  `-----/· · · · · · · ·\-----` * .</text>
+    <text x="0" y="260" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . *       |   ·   ·   ·   |       * . *</text>
+    <text x="0" y="270" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">. * . * . *  |               |  * . * . * .</text>
+    <text x="0" y="280" class="ascii-art" xml:space="preserve" dominant-baseline="hanging"> * . * . * . |               | . * . * . *</text>
+    <text x="0" y="290" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">.___________ |_______*_______|___________.</text>
+    <text x="0" y="300" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|            |       |       |            |</text>
+    <text x="0" y="310" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|            |       |       |            |</text>
+    <text x="0" y="320" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|____________|_______|_______|____________|</text>
+    <text x="0" y="330" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|                                         |</text>
+    <text x="0" y="340" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|    ~~~  ~~~  R A N K   S  ~~~  ~~~      |</text>
+    <text x="0" y="350" class="ascii-art" xml:space="preserve" dominant-baseline="hanging">|_________________________________________|</text>
   </g>
+  <text x="260" y="65" class="stat-label">Commits:</text>
+  <text x="330" y="65" class="stat-value">3989</text>
+  <text x="260" y="87" class="stat-label">PRs:</text>
+  <text x="330" y="87" class="stat-value">133</text>
+  <text x="260" y="109" class="stat-label">Stars:</text>
+  <text x="330" y="109" class="stat-value">5400</text>
+  <g transform="translate(260, 131)">
+    <text x="0" y="8" class="rank-sub">Rank:</text>
+    <text x="0" y="32" class="rank-text">Rank S (World Tree)</text>
+  </g>
+
 </svg>

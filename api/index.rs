@@ -7,6 +7,7 @@ use vercel_runtime::{Error, Request, Response, ResponseBody, run, service_fn};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    dotenvy::dotenv().ok();
     run(service_fn(handler)).await
 }
 
@@ -40,6 +41,9 @@ async fn rank_response(request: Request) -> Result<Response<ResponseBody>, Error
         .unwrap_or(false);
 
     let loading_style = query.get("style").map(|s| s.as_str());
+    let requested_width = query.get("width").and_then(|v| v.parse::<u32>().ok());
+    let requested_height = query.get("height").and_then(|v| v.parse::<u32>().ok());
+    let (output_width, output_height) = core::normalize_output_size(requested_width, requested_height);
 
     let username = match core::validate_github_username(user) {
         Ok(name) => name,
@@ -62,7 +66,15 @@ async fn rank_response(request: Request) -> Result<Response<ResponseBody>, Error
     };
 
     let rank = core::determine_rank(&stats);
-    let body = core::format_response(&username, &stats, rank, show_progress, loading_style);
+    let body = core::format_response(
+        &username,
+        &stats,
+        rank,
+        show_progress,
+        loading_style,
+        output_width,
+        output_height,
+    );
     plain_text(200, body)
 }
 
