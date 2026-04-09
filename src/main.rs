@@ -24,6 +24,7 @@ struct RankQuery {
 
 #[tokio::main]
 async fn main() {
+    dotenvy::dotenv().ok();
     let github = match core::GitHubClient::new() {
         Ok(client) => client,
         Err(error) => {
@@ -94,3 +95,4 @@ async fn rank_handler(
     headers.insert("content-type", "image/svg+xml; charset=utf-8".parse().unwrap());
     (StatusCode::OK, headers, body).into_response()
 }
+

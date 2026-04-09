@@ -7,6 +7,7 @@ use vercel_runtime::{Error, Request, Response, ResponseBody, run, service_fn};
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
+    dotenvy::dotenv().ok();
     run(service_fn(handler)).await
 }
 
