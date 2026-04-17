@@ -1,18 +1,13 @@
 {
-  "builds": [
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
     {
-      "src": "api/index.rs",
-      "use": "@vercel/rust"
-    }
-  ],
-  "routes": [
-    {
-      "src": "^/$",
-      "dest": "api/index.rs"
+      "source": "/",
+      "destination": "/api/index"
     },
     {
-      "src": "^/rank$",
-      "dest": "api/index.rs"
+      "source": "/rank",
+      "destination": "/api/index"
     }
   ]
 }
