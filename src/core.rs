@@ -2,7 +2,9 @@ use reqwest::{
     Client,
     header::{ACCEPT, AUTHORIZATION, HeaderMap, HeaderValue, USER_AGENT},
 };
+use serde::de::DeserializeOwned;
 use serde::Deserialize;
+use std::time::Duration;
 
 const RANK_D_ART: &str = include_str!("../rank/d.md");
 const RANK_C_ART: &str = include_str!("../rank/c.md");
@@ -285,6 +287,9 @@ impl GitHubClient {
 
         let client = Client::builder()
             .default_headers(headers)
+            .http1_only()
+            .connect_timeout(Duration::from_secs(10))
+            .timeout(Duration::from_secs(20))
             .build()
             .map_err(|error| format!("failed to build HTTP client: {error}"))?;
 
@@ -318,21 +323,7 @@ impl GitHubClient {
     }
 
     async fn fetch_search_total_count(&self, url: &str) -> Result<u64, String> {
-        let response = self
-            .client
-            .get(url)
-            .send()
-            .await
-            .map_err(|error| format!("request failed: {error}"))?;
-
-        if !response.status().is_success() {
-            return Err(format!("request failed with status {}", response.status()));
-        }
-
-        let payload: SearchCount = response
-            .json()
-            .await
-            .map_err(|error| format!("invalid search response: {error}"))?;
+        let payload: SearchCount = self.get_json(url).await?;
         Ok(payload.total_count)
     }
 
@@ -345,21 +336,7 @@ impl GitHubClient {
                 "https://api.github.com/users/{username}/repos?per_page=100&page={page}"
             );
 
-            let response = self
-                .client
-                .get(url)
-                .send()
-                .await
-                .map_err(|error| format!("request failed: {error}"))?;
-
-            if !response.status().is_success() {
-                return Err(format!("request failed with status {}", response.status()));
-            }
-
-            let repos: Vec<Repo> = response
-                .json()
-                .await
-                .map_err(|error| format!("invalid repo response: {error}"))?;
+            let repos: Vec<Repo> = self.get_json(&url).await?;
 
             if repos.is_empty() {
                 break;
@@ -374,5 +351,40 @@ impl GitHubClient {
         }
 
         Ok(total)
+    }
+
+    async fn get_json<T>(&self, url: &str) -> Result<T, String>
+    where
+        T: DeserializeOwned,
+    {
+        let mut last_error = None;
+
+        for attempt in 1..=3 {
+            match self.client.get(url).send().await {
+                Ok(response) => {
+                    let status = response.status();
+                    if !status.is_success() {
+                        let body = response
+                            .text()
+                            .await
+                            .unwrap_or_else(|_| "<failed to read response body>".to_string());
+                        return Err(format!(
+                            "request failed with status {status} for {url}: {}",
+                            body.trim()
+                        ));
+                    }
+
+                    return response
+                        .json()
+                        .await
+                        .map_err(|error| format!("invalid JSON response from {url}: {error}"));
+                }
+                Err(error) => {
+                    last_error = Some(format!("attempt {attempt}/3 failed for {url}: {error}"));
+                }
+            }
+        }
+
+        Err(last_error.unwrap_or_else(|| format!("request failed for {url}")))
     }
 }

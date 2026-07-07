@@ -13,9 +13,9 @@ async fn main() -> Result<(), Error> {
 
 async fn handler(request: Request) -> Result<Response<ResponseBody>, Error> {
     match request.uri().path() {
-        "/" => plain_text(200, core::help_text().to_string()),
+        "/" => text_response(200, core::help_text().to_string()),
         "/rank" => rank_response(request).await,
-        _ => plain_text(404, "Not Found".to_string()),
+        _ => text_response(404, "Not Found".to_string()),
     }
 }
 
@@ -29,7 +29,7 @@ async fn rank_response(request: Request) -> Result<Response<ResponseBody>, Error
     let user = match query.get("user") {
         Some(value) if !value.is_empty() => value,
         _ => {
-            return plain_text(
+            return text_response(
                 400,
                 "missing query param: user".to_string(),
             );
@@ -47,13 +47,13 @@ async fn rank_response(request: Request) -> Result<Response<ResponseBody>, Error
 
     let username = match core::validate_github_username(user) {
         Ok(name) => name,
-        Err(message) => return plain_text(400, message),
+        Err(message) => return text_response(400, message),
     };
 
     let github = match core::GitHubClient::new() {
         Ok(client) => client,
         Err(message) => {
-            return plain_text(
+            return text_response(
                 500,
                 format!("configuration error: {message}"),
             );
@@ -62,7 +62,7 @@ async fn rank_response(request: Request) -> Result<Response<ResponseBody>, Error
 
     let stats = match github.fetch_stats(&username).await {
         Ok(stats) => stats,
-        Err(message) => return plain_text(502, message),
+        Err(message) => return text_response(502, message),
     };
 
     let rank = core::determine_rank(&stats);
@@ -75,10 +75,17 @@ async fn rank_response(request: Request) -> Result<Response<ResponseBody>, Error
         output_width,
         output_height,
     );
-    plain_text(200, body)
+    svg_response(200, body)
 }
 
-fn plain_text(status: u16, body: String) -> Result<Response<ResponseBody>, Error> {
+fn text_response(status: u16, body: String) -> Result<Response<ResponseBody>, Error> {
+    Ok(Response::builder()
+        .status(status)
+        .header("content-type", "text/plain; charset=utf-8")
+        .body(body.into())?)
+}
+
+fn svg_response(status: u16, body: String) -> Result<Response<ResponseBody>, Error> {
     Ok(Response::builder()
         .status(status)
         .header("content-type", "image/svg+xml; charset=utf-8")
