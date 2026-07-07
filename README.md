@@ -69,7 +69,8 @@ GitHub の `commits / PRs / stars` からランクを判定し、ASCII art を�
 
 ## Local Run
 
-1. `GITHUB_PAT` か `github_pat` を環境変数に設定
+1. `GITHUB_PAT`、`GITHUB_TOKEN`、`GH_TOKEN`、`github_pat` のいずれかを環境変数に設定
+   - 未設定でも動作しますが、GitHub API のレート制限が厳しくなります
 2. `cargo run --bin github-status-my`
 3. `http://127.0.0.1:8080/rank?user=<username>&bar=true`
 

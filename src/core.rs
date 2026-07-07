@@ -402,16 +402,23 @@ impl GitHubClient {
             HeaderValue::from_static("2022-11-28"),
         );
 
-        let token_raw = std::env::var("GITHUB_PAT")
+        let token = std::env::var("GITHUB_PAT")
+            .or_else(|_| std::env::var("GITHUB_TOKEN"))
+            .or_else(|_| std::env::var("GH_TOKEN"))
             .or_else(|_| std::env::var("github_pat"))
-            .map_err(|_| "GITHUB_PAT is required. set your GitHub Personal Access Token".to_string())?;
-        let token = token_raw.trim();
-        if token.is_empty() {
-            return Err("GITHUB_PAT is empty".to_string());
+            .ok()
+            .map(|value| value.trim().to_string())
+            .filter(|value| !value.is_empty());
+
+        if let Some(token) = token {
+            let auth_value = HeaderValue::from_str(&format!("Bearer {token}"))
+                .map_err(|_| "invalid GitHub token header value".to_string())?;
+            headers.insert(AUTHORIZATION, auth_value);
+        } else {
+            eprintln!(
+                "[github-http] no GitHub token configured; continuing without Authorization header"
+            );
         }
-        let auth_value = HeaderValue::from_str(&format!("Bearer {token}"))
-            .map_err(|_| "invalid GITHUB_PAT header value".to_string())?;
-        headers.insert(AUTHORIZATION, auth_value);
 
         let config = HttpClientConfig::from_env()?;
         let mut builder = Client::builder()
