@@ -75,6 +75,26 @@ GitHub の `commits / PRs / stars` からランクを判定し、ASCII art を�
 
 必要なら `BIND_ADDR=0.0.0.0:8080 cargo run --bin github-status-my` のように待ち受け先を変更できます。
 
+### HTTP/TLS Diagnostics
+
+- 既定値は `GITHUB_HTTP_BACKEND=native-tls` と `GITHUB_HTTP_FORCE_HTTP1=true` です。
+- `GITHUB_HTTP_BACKEND=rustls` で `reqwest + rustls` に切り替えられます。
+- `GITHUB_HTTP_FORCE_HTTP1=false` で HTTP バージョン交渉を既定動作に戻せます。
+- `GITHUB_HTTP_TIMEOUT_SECS=20` で全体タイムアウトを変更できます。
+- `GITHUB_API_BASE=https://api.github.com` で API 送信先を切り替えられます。
+- `GITHUB_HTTP_TRACE=true` にすると成功レスポンスでも GitHub request ID / rate limit / TLS 証明書情報をログ出力します。
+
+例:
+
+```bash
+GITHUB_HTTP_BACKEND=rustls \
+GITHUB_HTTP_FORCE_HTTP1=false \
+GITHUB_HTTP_TRACE=true \
+cargo run --bin github-status-my
+```
+
+エラー時は標準エラーに `request_id`, `backend`, `protocol`, `endpoint`, `error_chain` を含む詳細ログを出力します。
+
 ## Response Type
 
 - `Content-Type: image/svg+xml; charset=utf-8`
