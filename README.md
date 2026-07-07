@@ -5,7 +5,7 @@ GitHub の `commits / PRs / stars` からランクを判定し、ASCII art を�
 ## Endpoint
 
 - Production: `https://github-status-my.vercel.app/rank`
-- Local: `http://localhost:8080/rank`
+- Local: `http://127.0.0.1:8080/rank`
 
 ## Query Parameters
 
@@ -71,7 +71,9 @@ GitHub の `commits / PRs / stars` からランクを判定し、ASCII art を�
 
 1. `GITHUB_PAT` か `github_pat` を環境変数に設定
 2. `cargo run --bin github-status-my`
-3. `http://localhost:8080/rank?user=<username>&bar=true`
+3. `http://127.0.0.1:8080/rank?user=<username>&bar=true`
+
+必要なら `BIND_ADDR=0.0.0.0:8080 cargo run --bin github-status-my` のように待ち受け先を変更できます。
 
 ## Response Type
 

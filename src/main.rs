@@ -39,16 +39,19 @@ async fn main() {
         .route("/rank", get(rank_handler))
         .with_state(state);
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:8080")
+    let bind_addr = std::env::var("BIND_ADDR").unwrap_or_else(|_| "127.0.0.1:8080".to_string());
+    let listener = tokio::net::TcpListener::bind(&bind_addr)
         .await
         .expect("failed to bind server");
 
-    println!("listening on http://0.0.0.0:8080");
+    println!("listening on http://{bind_addr}");
     axum::serve(listener, app).await.expect("server error");
 }
 
 async fn index_handler() -> impl IntoResponse {
-    (StatusCode::OK, core::help_text())
+    let mut headers = HeaderMap::new();
+    headers.insert("content-type", "text/plain; charset=utf-8".parse().unwrap());
+    (StatusCode::OK, headers, core::help_text()).into_response()
 }
 
 async fn rank_handler(
@@ -67,7 +70,7 @@ async fn rank_handler(
         Ok(name) => name,
         Err(message) => {
             let mut headers = HeaderMap::new();
-            headers.insert("content-type", "image/svg+xml; charset=utf-8".parse().unwrap());
+            headers.insert("content-type", "text/plain; charset=utf-8".parse().unwrap());
             return (StatusCode::BAD_REQUEST, headers, message).into_response();
         }
     };
@@ -76,7 +79,7 @@ async fn rank_handler(
         Ok(stats) => stats,
         Err(message) => {
             let mut headers = HeaderMap::new();
-            headers.insert("content-type", "image/svg+xml; charset=utf-8".parse().unwrap());
+            headers.insert("content-type", "text/plain; charset=utf-8".parse().unwrap());
             return (StatusCode::BAD_GATEWAY, headers, message).into_response();
         }
     };
@@ -95,4 +98,3 @@ async fn rank_handler(
     headers.insert("content-type", "image/svg+xml; charset=utf-8".parse().unwrap());
     (StatusCode::OK, headers, body).into_response()
 }
-
