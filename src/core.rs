@@ -56,6 +56,7 @@ pub enum Rank {
 pub struct RankRequirements {
     pub commits: u64,
     pub prs: u64,
+    pub stars: u64,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -123,14 +124,11 @@ impl Rank {
 
     pub fn requirements(self) -> RankRequirements {
         match self {
-            Rank::D => RankRequirements { commits: 0, prs: 0 },
-            Rank::C => RankRequirements { commits: 50, prs: 5 },
-            Rank::B => RankRequirements { commits: 200, prs: 20 },
-            Rank::A => RankRequirements { commits: 500, prs: 50 },
-            Rank::S => RankRequirements {
-                commits: 1000,
-                prs: 100,
-            },
+            Rank::D => RankRequirements { commits: 0, prs: 0, stars: 0 },
+            Rank::C => RankRequirements { commits: 50, prs: 5, stars: 0 },
+            Rank::B => RankRequirements { commits: 200, prs: 20, stars: 0 },
+            Rank::A => RankRequirements { commits: 500, prs: 50, stars: 10 },
+            Rank::S => RankRequirements { commits: 1000, prs: 100, stars: 50 },
         }
     }
 
@@ -242,17 +240,13 @@ pub fn validate_github_username(raw: &str) -> Result<String, String> {
 }
 
 pub fn determine_rank(stats: &GitHubStats) -> Rank {
-    if stats.commits >= 1000 && stats.prs >= 100 && stats.stars >= 50 {
-        Rank::S
-    } else if stats.commits >= 500 && stats.prs >= 50 && stats.stars >= 10 {
-        Rank::A
-    } else if stats.commits >= 200 && stats.prs >= 20 {
-        Rank::B
-    } else if stats.commits >= 50 && stats.prs >= 5 {
-        Rank::C
-    } else {
-        Rank::D
+    for rank in [Rank::S, Rank::A, Rank::B, Rank::C] {
+        let req = rank.requirements();
+        if stats.commits >= req.commits && stats.prs >= req.prs && stats.stars >= req.stars {
+            return rank;
+        }
     }
+    Rank::D
 }
 
 pub fn format_response(

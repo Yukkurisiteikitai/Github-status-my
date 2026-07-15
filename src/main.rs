@@ -48,10 +48,18 @@ async fn main() {
     axum::serve(listener, app).await.expect("server error");
 }
 
-async fn index_handler() -> impl IntoResponse {
+fn build_response(status: StatusCode, content_type: &str, body: impl Into<String>) -> axum::response::Response {
     let mut headers = HeaderMap::new();
-    headers.insert("content-type", "text/plain; charset=utf-8".parse().unwrap());
-    (StatusCode::OK, headers, core::help_text()).into_response()
+    headers.insert("content-type", content_type.parse().unwrap());
+    (status, headers, body.into()).into_response()
+}
+
+fn text_response(status: StatusCode, body: impl Into<String>) -> axum::response::Response {
+    build_response(status, "text/plain; charset=utf-8", body)
+}
+
+async fn index_handler() -> impl IntoResponse {
+    text_response(StatusCode::OK, core::help_text())
 }
 
 async fn rank_handler(
@@ -68,20 +76,12 @@ async fn rank_handler(
 
     let username = match core::validate_github_username(&query.user) {
         Ok(name) => name,
-        Err(message) => {
-            let mut headers = HeaderMap::new();
-            headers.insert("content-type", "text/plain; charset=utf-8".parse().unwrap());
-            return (StatusCode::BAD_REQUEST, headers, message).into_response();
-        }
+        Err(message) => return text_response(StatusCode::BAD_REQUEST, message),
     };
 
     let stats = match state.github.fetch_stats(&username).await {
         Ok(stats) => stats,
-        Err(message) => {
-            let mut headers = HeaderMap::new();
-            headers.insert("content-type", "text/plain; charset=utf-8".parse().unwrap());
-            return (StatusCode::BAD_GATEWAY, headers, message).into_response();
-        }
+        Err(message) => return text_response(StatusCode::BAD_GATEWAY, message),
     };
 
     let rank = core::determine_rank(&stats);
@@ -94,7 +94,5 @@ async fn rank_handler(
         output_width,
         output_height,
     );
-    let mut headers = HeaderMap::new();
-    headers.insert("content-type", "image/svg+xml; charset=utf-8".parse().unwrap());
-    (StatusCode::OK, headers, body).into_response()
+    build_response(StatusCode::OK, "image/svg+xml; charset=utf-8", body)
 }
